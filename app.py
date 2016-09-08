@@ -12,18 +12,39 @@ from docker import Client
 
 app = Flask(__name__)
 
-@app.route("/")
+@app.route('/')
 def main():
     return jsonify(success=True, data=[]), 200
 
-@app.route("/hooks/<hook>", methods=['POST'])
-def hook_listen(hook):
+@app.route('/images/<image>/pull', methods=['POST'])
+def image_puller(image):
     if request.args.get('token') != os.environ.get('TOKEN'):
         return jsonify(success=False, error="Invalid token"), 403
 
-    docker = Client(base_url='unix://var/run/docker.sock', timeout=10)
+    docker = Client(base_url='unix://var/run/docker.sock', timeout=5)
 
-    return jsonify(success=True, data=docker.containers()), 200
+    containers = []
+    for container in docker.containers():
+        if image in container.get('Image'):
+            containers.append(container)
+
+    if containers.size is 0:
+        return jsonify(success=False, error="No containers found"), 404
+
+    for container in containers:
+        docker.pull(container.get('Image'))
+
+    for container in containers:
+        docker.stop(container.get('Image'))
+        docker.remove_container(container.get('Image'))
+
+    new_containers_ids = []
+    for container in containers:
+        container = docker.create_container(container.get('Image'))
+        response = docker.start(container=container.get('Id'))
+        new_containers_ids.append(container.get('Id'))
+
+    return jsonify(success=True, data=new_containers_ids), 200
 
 @click.command()
 @click.option('-h',      default = 'localhost', help = 'Set the host')
