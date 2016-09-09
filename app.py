@@ -29,29 +29,31 @@ def image_puller():
 
     docker = Client(base_url='unix://var/run/docker.sock', timeout=5)
 
-    image_name = ''
     old_containers = []
     for cont in docker.containers():
-        if image in cont.get('Image'):
+        cont_image = cont.get('Image')
+        if image in cont_image:
             old_containers.append(cont)
-            if not image_name:
-                image_name = cont.get('Image')
+            image = cont_image
+            break
 
     if len(old_containers) is 0:
-        return jsonify(success=False, error="No containers found"), 404
+        return jsonify(success=False, error="No running containers found with the specified image"), 404
 
-    # print 'Pulling image...'
-    # print containers[0]
-    # for line in docker.pull(image_name, stream=True):
-    #     print json.dumps(json.loads(line), indent = 4)
+    image = image.split(':')
+    image_name = image[0]
+    image_tag  = image[1] if len(image) == 2 else 'latest'
 
-    print 'Creating containers...'
+    print 'Pulling new image...'
+    docker.pull(image_name, tag=image_tag)
+
+    print 'Creating new containers...'
     new_containers = []
     for cont in old_containers:
         new_cont = docker.create_container(image=cont.get('Image')) #volumes_from=cont_name
         new_containers.append(new_cont)
 
-    print 'Stopping containers...'
+    print 'Stopping old containers...'
     for cont in old_containers:
         docker.stop(container=cont.get('Id'))
 
