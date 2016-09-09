@@ -3,6 +3,7 @@
 
 import os, sys
 import click
+import json
 
 from flask import Flask
 from flask import request
@@ -23,28 +24,41 @@ def image_puller(image):
 
     docker = Client(base_url='unix://var/run/docker.sock', timeout=5)
 
-    containers = []
-    for container in docker.containers():
-        if image in container.get('Image'):
-            containers.append(container)
+    image_name = ''
+    old_containers = []
+    for cont in docker.containers():
+        if image in cont.get('Image'):
+            old_containers.append(cont)
+            if not image_name:
+                image_name = cont.get('Image')
 
-    if containers.size is 0:
+    if len(old_containers) is 0:
         return jsonify(success=False, error="No containers found"), 404
 
-    for container in containers:
-        docker.pull(container.get('Image'))
+    # print 'Pulling image...'
+    # print containers[0]
+    # for line in docker.pull(image_name, stream=True):
+    #     print json.dumps(json.loads(line), indent = 4)
 
-    for container in containers:
-        docker.stop(container.get('Image'))
-        docker.remove_container(container.get('Image'))
+    print 'Creating containers...'
+    new_containers = []
+    for cont in old_containers:
+        new_cont = docker.create_container(image=cont.get('Image')) #volumes_from=cont_name
+        new_containers.append(new_cont)
 
-    new_containers_ids = []
-    for container in containers:
-        container = docker.create_container(container.get('Image'))
-        response = docker.start(container=container.get('Id'))
-        new_containers_ids.append(container.get('Id'))
+    print 'Stopping containers...'
+    for cont in old_containers:
+        docker.stop(container=cont.get('Id'))
 
-    return jsonify(success=True, data=new_containers_ids), 200
+    print 'Starting new containers...'
+    for cont in new_containers:
+        docker.start(container=cont.get('Id'))
+
+    print 'Removing old containers...'
+    for cont in old_containers:
+        docker.remove_container(container=cont.get('Id'))
+
+    return jsonify(success=True, data=new_containers), 200
 
 @click.command()
 @click.option('-h',      default = 'localhost', help = 'Set the host')
