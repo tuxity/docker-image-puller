@@ -17,8 +17,13 @@ app = Flask(__name__)
 def main():
     return jsonify(success=True, data=[]), 200
 
-@app.route('/images/<image>/pull', methods=['POST'])
-def image_puller(image):
+@app.route('/images/pull', methods=['POST'])
+def image_puller():
+    if not request.args.get('token') or not request.args.get('image'):
+        return jsonify(success=False, error="Missing parameters"), 400
+
+    image = request.args.get('image')
+
     if request.args.get('token') != os.environ.get('TOKEN'):
         return jsonify(success=False, error="Invalid token"), 403
 
