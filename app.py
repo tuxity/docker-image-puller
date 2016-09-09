@@ -33,8 +33,8 @@ def image_puller():
     for cont in docker.containers():
         cont_image = cont.get('Image')
         if image in cont_image:
-            old_containers.append(cont)
             image = cont_image
+            old_containers.append(cont)
             break
 
     if len(old_containers) is 0:
@@ -69,9 +69,9 @@ def image_puller():
     return jsonify(success=True, data=new_containers), 200
 
 @click.command()
-@click.option('-h',      default = 'localhost', help = 'Set the host')
-@click.option('-p',      default = 8080,        help = 'Set port on which we have to listen')
-@click.option('--debug', default = False,       help = 'Enable debug option')
+@click.option('-h',      default='localhost', help='Set the host')
+@click.option('-p',      default=8080,        help='Set port on which we have to listen')
+@click.option('--debug', default=False,       help='Enable debug option')
 def main(h, p ,debug):
     if not os.environ.get('TOKEN'):
         print 'ERROR: Missing TOKEN env variable'
