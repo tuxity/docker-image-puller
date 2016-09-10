@@ -69,13 +69,13 @@ def image_puller():
     return jsonify(success=True, data=new_containers), 200
 
 @click.command()
-@click.option('-h',      default='localhost', help='Set the host')
-@click.option('-p',      default=8080,        help='Set port on which we have to listen')
-@click.option('--debug', default=False,       help='Enable debug option')
+@click.option('-h',      default='0.0.0.0', help='Set the host')
+@click.option('-p',      default=8080,      help='Set the listening port')
+@click.option('--debug', default=False,     help='Enable debug option')
 def main(h, p ,debug):
     if not os.environ.get('TOKEN'):
         print 'ERROR: Missing TOKEN env variable'
-        sys.exit(0)
+        sys.exit(1)
 
     app.run(
         host  = os.environ.get('HOST')  if os.environ.get('HOST')  else h,
