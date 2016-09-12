@@ -1,8 +1,9 @@
 Docker Image Puller
 ===================
 
-[![Docker Automated buil](https://img.shields.io/docker/automated/jrottenberg/ffmpeg.svg?maxAge=2592000)](https://hub.docker.com/r/tuxity/docker-image-puller/)
-[![DUB](https://img.shields.io/dub/l/vibe-d.svg?maxAge=2592000)](https://github.com/Tuxity/docker-image-puller/blob/master/LICENSE)
+[![](https://images.microbadger.com/badges/version/tuxity/docker-image-puller.svg)](https://hub.docker.com/r/tuxity/docker-image-puller/)
+![](https://images.microbadger.com/badges/image/tuxity/docker-image-puller.svg)
+
 
 ## Overview
 
