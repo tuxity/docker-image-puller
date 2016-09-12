@@ -4,6 +4,7 @@
 import os, sys
 import click
 import json
+import re
 
 from flask import Flask
 from flask import request
@@ -32,7 +33,7 @@ def image_puller():
     old_containers = []
     for cont in docker.containers():
         cont_image = cont.get('Image')
-        if image in cont_image:
+        if re.match( r'.*' + re.escape(image) + r'$', cont_image):
             image = cont_image
             old_containers.append(cont)
             break
