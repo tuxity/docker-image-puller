@@ -32,7 +32,7 @@ def image_puller():
 
     old_containers = []
     for cont in docker.containers():
-        cont_image = cont.get('Image')
+        cont_image = cont['Image']
         if re.match( r'.*' + re.escape(image) + r'$', cont_image):
             image = cont_image
             old_containers.append(cont)
@@ -53,24 +53,28 @@ def image_puller():
     new_containers = []
     for cont in old_containers:
         ports={}
-        for p in cont.get('Ports'):
-            if p.get('PublicPort'):
-                ports[str(p['PrivatePort']) + '/' + p['Type']] = (p.get('IP', '0.0.0.0'), p.get('PublicPort'))
-        print ports
-        new_cont = docker.create_container(image=cont.get('Image'), host_config=docker.create_host_config(port_bindings=ports)) #volumes_from=cont_name
+        for p in cont['Ports']:
+            if 'PublicPort' in  p:
+                ports[str(p['PrivatePort']) + '/' + p['Type']] = (p.get('IP', '0.0.0.0'), p['PublicPort'])
+
+        # Create a host config for the new container with the same ports as the original one
+        # TODO: same with volumes
+        host_config = docker.create_host_config(port_bindings=ports)
+
+        new_cont = docker.create_container(image=cont['Image'], host_config=host_config) #volumes_from=cont_name
         new_containers.append(new_cont)
 
     print '\tStopping old containers...'
     for cont in old_containers:
-        docker.stop(container=cont.get('Id'))
+        docker.stop(container=cont['Id'])
 
     print '\tStarting new containers...'
     for cont in new_containers:
-        docker.start(container=cont.get('Id'))
+        docker.start(container=cont['Id'])
 
     print '\tRemoving old containers...'
     for cont in old_containers:
-        docker.remove_container(container=cont.get('Id'))
+        docker.remove_container(container=cont['Id'])
 
     return jsonify(success=True, data=new_containers), 200
 
