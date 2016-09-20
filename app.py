@@ -34,9 +34,9 @@ def image_puller():
 
     old_containers = []
     for cont in docker.containers():
-        cont_image = cont['Image']
-        if re.match( r'.*' + re.escape(image) + r'$', cont_image):
-            image = cont_image
+        if re.match( r'.*' + re.escape(image) + r'$', cont['Image']):
+            cont = docker.inspect_container(container=cont['Id'])
+            image = cont['Config']['Image']
             old_containers.append(cont)
 
     if len(old_containers) is 0:
@@ -53,16 +53,7 @@ def image_puller():
     print('\tCreating new containers...')
     new_containers = []
     for cont in old_containers:
-        port_binds={}
-        for port in cont['Ports']:
-            if 'PublicPort' in port:
-                port_binds[str(port['PrivatePort']) + '/' + port['Type']] = (port.get('IP', '0.0.0.0'), port['PublicPort'])
-
-        # Create a host config for the new container with the same ports as the original one
-        # TODO: same with volumes
-        host_config = docker.create_host_config(port_bindings=port_binds)
-
-        new_cont = docker.create_container(image=cont['Image'], host_config=host_config)
+        new_cont = docker.create_container(image=cont['Config']['Image'], host_config=cont['HostConfig'])
         new_containers.append(new_cont)
 
     print('\tStopping old containers...')
