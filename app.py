@@ -53,7 +53,7 @@ def image_puller():
     print('\tCreating new containers...')
     new_containers = []
     for cont in old_containers:
-        new_cont = docker.create_container(image=cont['Config']['Image'], host_config=cont['HostConfig'])
+        new_cont = docker.create_container(image=cont['Config']['Image'], environment=cont['Config']['Env'], host_config=cont['HostConfig'])
         new_containers.append(new_cont)
 
     print('\tStopping old containers...')
