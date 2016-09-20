@@ -43,15 +43,15 @@ def image_puller():
     if len(old_containers) is 0:
         return jsonify(success=False, error="No running containers found with the specified image"), 404
 
-    print 'Updating ' + str(len(old_containers)) + ' containers with ' + image + ' image'
+    print('Updating', str(len(old_containers)), 'containers with', image, 'image')
     image = image.split(':')
     image_name = image[0]
     image_tag  = image[1] if len(image) == 2 else 'latest'
 
-    print '\tPulling new image...'
+    print('\tPulling new image...')
     docker.pull(image_name, tag=image_tag)
 
-    print '\tCreating new containers...'
+    print('\tCreating new containers...')
     new_containers = []
     for cont in old_containers:
         port_binds={}
@@ -66,15 +66,15 @@ def image_puller():
         new_cont = docker.create_container(image=cont['Image'], host_config=host_config)
         new_containers.append(new_cont)
 
-    print '\tStopping old containers...'
+    print('\tStopping old containers...')
     for cont in old_containers:
         docker.stop(container=cont['Id'])
 
-    print '\tStarting new containers...'
+    print('\tStarting new containers...')
     for cont in new_containers:
         docker.start(container=cont['Id'])
 
-    print '\tRemoving old containers...'
+    print('\tRemoving old containers...')
     for cont in old_containers:
         docker.remove_container(container=cont['Id'])
 
@@ -86,7 +86,7 @@ def image_puller():
 @click.option('--debug', default=False,     help='Enable debug option')
 def main(h, p ,debug):
     if not os.environ.get('TOKEN'):
-        print 'ERROR: Missing TOKEN env variable'
+        print('ERROR: Missing TOKEN env variable')
         sys.exit(1)
 
     app.run(
