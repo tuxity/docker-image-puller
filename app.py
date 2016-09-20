@@ -38,7 +38,6 @@ def image_puller():
         if re.match( r'.*' + re.escape(image) + r'$', cont_image):
             image = cont_image
             old_containers.append(cont)
-            break
 
     if len(old_containers) is 0:
         return jsonify(success=False, error="No running containers found with the specified image"), 404
