@@ -12,6 +12,8 @@ from flask import jsonify
 
 from docker import Client
 
+DOCKER_HOST = 'unix://var/run/docker.sock'
+
 app = Flask(__name__)
 
 @app.route('/')
@@ -28,7 +30,7 @@ def image_puller():
     if request.args.get('token') != os.environ.get('TOKEN'):
         return jsonify(success=False, error="Invalid token"), 403
 
-    docker = Client(base_url='unix://var/run/docker.sock', timeout=5)
+    docker = Client(base_url=DOCKER_HOST, timeout=5)
 
     old_containers = []
     for cont in docker.containers():
@@ -52,16 +54,16 @@ def image_puller():
     print '\tCreating new containers...'
     new_containers = []
     for cont in old_containers:
-        ports={}
-        for p in cont['Ports']:
-            if 'PublicPort' in  p:
-                ports[str(p['PrivatePort']) + '/' + p['Type']] = (p.get('IP', '0.0.0.0'), p['PublicPort'])
+        port_binds={}
+        for port in cont['Ports']:
+            if 'PublicPort' in port:
+                port_binds[str(port['PrivatePort']) + '/' + port['Type']] = (port.get('IP', '0.0.0.0'), port['PublicPort'])
 
         # Create a host config for the new container with the same ports as the original one
         # TODO: same with volumes
-        host_config = docker.create_host_config(port_bindings=ports)
+        host_config = docker.create_host_config(port_bindings=port_binds)
 
-        new_cont = docker.create_container(image=cont['Image'], host_config=host_config) #volumes_from=cont_name
+        new_cont = docker.create_container(image=cont['Image'], host_config=host_config)
         new_containers.append(new_cont)
 
     print '\tStopping old containers...'

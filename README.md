@@ -4,7 +4,6 @@ Docker Image Puller
 [![](https://images.microbadger.com/badges/version/tuxity/docker-image-puller.svg)](https://hub.docker.com/r/tuxity/docker-image-puller/)
 ![](https://images.microbadger.com/badges/image/tuxity/docker-image-puller.svg)
 
-
 ## Overview
 
 If you work with docker and continuous integrations tools, you might need to update your images on your servers as soos as your build is finish.
