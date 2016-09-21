@@ -30,6 +30,8 @@ def image_puller():
     if request.args.get('token') != os.environ.get('TOKEN'):
         return jsonify(success=False, error="Invalid token"), 403
 
+    restart_containers = True if request.args.get('restart_containers') == "true" else False
+
     docker = Client(base_url=DOCKER_HOST, timeout=5)
 
     old_containers = []
@@ -49,6 +51,9 @@ def image_puller():
 
     print('\tPulling new image...')
     docker.pull(image_name, tag=image_tag)
+
+    if restart_containers is False:
+        return jsonify(success=True, data={}), 200
 
     print('\tCreating new containers...')
     new_containers = []
