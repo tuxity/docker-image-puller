@@ -40,7 +40,7 @@ DEBUG (default: False)
 
 After, you just have to make a request to the server:
 ```
-POST http://ipofyourserver/images/pull?token=abcd4242&image=nginx:latest
+POST http://ipofyourserver/images/pull?token=abcd4242&restart_containers=true&image=nginx:latest
 ```
 
 ## Logs
