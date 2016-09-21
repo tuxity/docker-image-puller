@@ -3,7 +3,6 @@
 
 import os, sys
 import click
-import json
 import re
 
 from flask import Flask
