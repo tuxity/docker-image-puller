@@ -57,6 +57,9 @@ def image_puller():
     print('\tCreating new containers...')
     new_containers = []
     for cont in old_containers:
+        if os.environ['HOSTNAME'] == cont['Id']:
+            return jsonify(success=False, error="You can't restart the container where the puller script is running"), 403
+
         new_cont = docker.create_container(image=cont['Config']['Image'], environment=cont['Config']['Env'], host_config=cont['HostConfig'])
         new_containers.append(new_cont)
 
