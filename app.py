@@ -22,15 +22,15 @@ def main():
 
 @app.route('/images/pull', methods=['POST'])
 def image_puller():
-    if not request.args.get('token') or not request.args.get('image'):
+    if not request.args['token'] or not request.args['image']:
         return jsonify(success=False, error="Missing parameters"), 400
 
-    image = request.args.get('image')
+    image = request.args['image']
 
-    if request.args.get('token') != os.environ.get('TOKEN'):
+    if request.args['token'] != os.environ['TOKEN']:
         return jsonify(success=False, error="Invalid token"), 403
 
-    restart_containers = True if request.args.get('restart_containers') == "true" else False
+    restart_containers = True if request.args['restart_containers'] == "true" else False
 
     docker = Client(base_url=DOCKER_HOST, timeout=5)
 
@@ -85,9 +85,9 @@ def main(h, p ,debug):
         sys.exit(1)
 
     app.run(
-        host  = os.environ.get('HOST')  if os.environ.get('HOST')  else h,
-        port  = os.environ.get('PORT')  if os.environ.get('PORT')  else p,
-        debug = os.environ.get('DEBUG') if os.environ.get('DEBUG') else debug
+        host  = os.environ.get('HOST', default=h),
+        port  = os.environ.get('PORT', default=p),
+        debug = os.environ.get('DEBUG', default=debug)
     )
 
 if __name__ == "__main__":
