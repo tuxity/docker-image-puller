@@ -53,7 +53,7 @@ def image_puller():
     docker.pull(image_name, tag=image_tag)
 
     if restart_containers is False:
-        return jsonify(success=True, data={}), 200
+        return jsonify(success=True), 200
 
     print('\tCreating new containers...')
     new_containers = []
@@ -73,7 +73,7 @@ def image_puller():
     for cont in old_containers:
         docker.remove_container(container=cont['Id'])
 
-    return jsonify(success=True, data=new_containers), 200
+    return jsonify(success=True), 200
 
 @click.command()
 @click.option('-h',      default='0.0.0.0', help='Set the host')
