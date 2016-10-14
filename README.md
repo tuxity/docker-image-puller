@@ -6,7 +6,7 @@ Docker Image Puller
 
 ## Overview
 
-If you work with docker and continuous integrations tools, you might need to update your images on your servers as soos as your build is finish.
+If you work with docker and continuous integrations tools, you might need to update your images on your servers as soon as your build is finished.
 
 This tool is a tiny webserver listening for a `POST` and automatically update the specified image using [Docker](https://docs.docker.com/engine/reference/api/docker_remote_api/) API.
 
