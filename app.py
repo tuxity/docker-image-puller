@@ -50,8 +50,7 @@ def image_puller():
 
     print('\tPulling new image...')
     pull_res = docker.pull(image_name, tag=image_tag)
-    if app.debug:
-        print(pull_res)
+    print(pull_res)
 
     if restart_containers is False:
         return jsonify(success=True), 200
