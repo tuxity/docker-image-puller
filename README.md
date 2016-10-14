@@ -23,7 +23,7 @@ Launch the image on your server, where the images you want to update are
 docker run -d \
   --name dip \
   --env TOKEN=abcd4242 \
-  -p 8080:8080
+  -p 8080:8080 \
   -v /var/run/docker.sock:/var/run/docker.sock \
   tuxity/docker-image-puller
 ```
