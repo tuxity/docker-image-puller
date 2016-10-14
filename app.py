@@ -31,7 +31,7 @@ def image_puller():
 
     restart_containers = True if request.args['restart_containers'] == "true" else False
 
-    docker = Client(base_url=DOCKER_HOST, timeout=5)
+    docker = Client(base_url=DOCKER_HOST)
 
     old_containers = []
     for cont in docker.containers():
