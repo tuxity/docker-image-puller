@@ -49,7 +49,9 @@ def image_puller():
     image_tag  = image[1] if len(image) == 2 else 'latest'
 
     print('\tPulling new image...')
-    docker.pull(image_name, tag=image_tag)
+    pull_res = docker.pull(image_name, tag=image_tag)
+    if app.debug:
+        print(pull_res)
 
     if restart_containers is False:
         return jsonify(success=True), 200
@@ -81,7 +83,7 @@ def image_puller():
 @click.option('-h',      default='0.0.0.0', help='Set the host')
 @click.option('-p',      default=8080,      help='Set the listening port')
 @click.option('--debug', default=False,     help='Enable debug option')
-def main(h, p ,debug):
+def main(h, p, debug):
     if not os.environ.get('TOKEN'):
         print('ERROR: Missing TOKEN env variable')
         sys.exit(1)
