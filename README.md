@@ -23,6 +23,8 @@ Launch the image on your server, where the images you want to update are
 docker run -d \
   --name dip \
   --env TOKEN=abcd4242 \
+  --env REGISTRY_USER=roberto \
+  --env REGISTRY_PASSWD=robertopwd \
   -p 8080:8080 \
   -v /var/run/docker.sock:/var/run/docker.sock \
   tuxity/docker-image-puller
@@ -30,13 +32,16 @@ docker run -d \
 
 Available env variable:
 ```
-TOKEN
+TOKEN*
+REGISTRY_USER
+REGISTRY_PASSWD
+REGISTRY_URL (default: https://index.docker.io/v1/)
 HOST (default: 0.0.0.0)
 PORT (default: 8080)
 DEBUG (default: False)
 ```
 
-`TOKEN` is a mandatory variable, without it it won't work. You can generate a random string, it's a security measure.
+\* mandatory variables. For `TOKEN` You can generate a random string, it's a security measure.
 
 After, you just have to make a request to the server:
 ```

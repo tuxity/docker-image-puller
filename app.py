@@ -14,10 +14,11 @@ from docker import Client
 DOCKER_HOST = 'unix://var/run/docker.sock'
 
 app = Flask(__name__)
+docker = Client(base_url=DOCKER_HOST)
 
 @app.route('/')
 def main():
-    return jsonify(success=True, data=[]), 200
+    return jsonify(success=True), 200
 
 @app.route('/images/pull', methods=['POST'])
 def image_puller():
@@ -30,8 +31,6 @@ def image_puller():
         return jsonify(success=False, error="Invalid token"), 403
 
     restart_containers = True if request.args['restart_containers'] == "true" else False
-
-    docker = Client(base_url=DOCKER_HOST)
 
     old_containers = []
     for cont in docker.containers():
@@ -86,6 +85,17 @@ def main(h, p, debug):
     if not os.environ.get('TOKEN'):
         print('ERROR: Missing TOKEN env variable')
         sys.exit(1)
+
+    registry_user = os.environ.get('REGISTRY_USER')
+    registry_passwd = os.environ.get('REGISTRY_PASSWD')
+    registry_url = os.environ.get('REGISTRY_URL', 'https://index.docker.io/v1/')
+
+    if registry_user and registry_passwd:
+        try:
+            docker.login(username=registry_user, password=registry_passwd, registry=registry_url)
+        except Exception as e:
+            print(e)
+            sys.exit(1)
 
     app.run(
         host  = os.environ.get('HOST', default=h),
