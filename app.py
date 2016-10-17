@@ -48,8 +48,7 @@ def image_puller():
     image_tag  = image[1] if len(image) == 2 else 'latest'
 
     print('\tPulling new image...')
-    pull_res = docker.pull(image_name, tag=image_tag)
-    print(pull_res)
+    docker.pull(image_name, tag=image_tag)
 
     if restart_containers is False:
         return jsonify(success=True), 200
