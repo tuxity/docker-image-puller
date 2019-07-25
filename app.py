@@ -9,12 +9,10 @@ from flask import Flask
 from flask import request
 from flask import jsonify
 
-from docker import Client
-
-DOCKER_HOST = 'unix://var/run/docker.sock'
+import docker
 
 app = Flask(__name__)
-docker = Client(base_url=DOCKER_HOST)
+client = docker.from_env()
 
 @app.route('/')
 def main():
@@ -33,11 +31,9 @@ def image_puller():
     restart_containers = True if request.args['restart_containers'] == "true" else False
 
     old_containers = []
-    for cont in docker.containers():
-        if re.match( r'.*' + re.escape(image) + r'$', cont['Image']):
-            cont = docker.inspect_container(container=cont['Id'])
-            image = cont['Config']['Image']
-            old_containers.append(cont)
+    for container in client.containers.list():
+        if re.match( r'.*' + re.escape(image) + r'$', container.attrs['Config']['Image']):
+            old_containers.append(container)
 
     if len(old_containers) is 0:
         return jsonify(success=False, error="No running containers found with the specified image"), 404
@@ -48,31 +44,32 @@ def image_puller():
     image_tag  = image[1] if len(image) == 2 else 'latest'
 
     print ('\tPulling new image...')
-    docker.pull(image_name, tag=image_tag)
+    client.images.pull(image_name, tag=image_tag)
 
     if restart_containers is False:
         return jsonify(success=True), 200
 
     print ('\tCreating new containers...')
     new_containers = []
-    for cont in old_containers:
-        if 'HOSTNAME' in os.environ and os.environ['HOSTNAME'] == cont['Id']:
+    for container in old_containers:
+        if 'HOSTNAME' in os.environ and os.environ['HOSTNAME'] == container.attrs['Id']:
             return jsonify(success=False, error="You can't restart the container where the puller script is running"), 403
 
-        new_cont = docker.create_container(image=cont['Config']['Image'], environment=cont['Config']['Env'], host_config=cont['HostConfig'])
-        new_containers.append(new_cont)
+        new_cont = docker.APIClient().create_container(container.attrs['Config']['Image'], environment=container.attrs['Config']['Env'], host_config=container['HostConfig'])
+        
+        new_containers.append(client.containers.get(new_cont['Id']))
 
     print ('\tStopping old containers...')
-    for cont in old_containers:
-        docker.stop(container=cont['Id'])
+    for container in old_containers:
+        container.stop()
 
     print ('\tStarting new containers...')
-    for cont in new_containers:
-        docker.start(container=cont['Id'])
+    for container in new_containers:
+        container.start()
 
     print ('\tRemoving old containers...')
-    for cont in old_containers:
-        docker.remove_container(container=cont['Id'])
+    for container in old_containers:
+        container.remove()
 
     return jsonify(success=True), 200
 
