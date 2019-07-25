@@ -1,4 +1,4 @@
-FROM python:3.5-alpine
+FROM python:3.7-alpine
 MAINTAINER Kévin Darcel <kevin.darcel@gmail.com>
 
 WORKDIR /usr/src/docker-image-updater
