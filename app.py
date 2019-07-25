@@ -55,7 +55,7 @@ def image_puller():
         if 'HOSTNAME' in os.environ and os.environ['HOSTNAME'] == container.attrs['Id']:
             return jsonify(success=False, error="You can't restart the container where the puller script is running"), 403
 
-        new_cont = docker.APIClient().create_container(container.attrs['Config']['Image'], environment=container.attrs['Config']['Env'], host_config=container['HostConfig'])
+        new_cont = docker.APIClient().create_container(container.attrs['Config']['Image'], environment=container.attrs['Config']['Env'], host_config=container.attrs['HostConfig'])
         
         new_containers.append(client.containers.get(new_cont['Id']))
 
