@@ -47,7 +47,7 @@ def image_puller():
     client.images.pull(image_name, tag=image_tag)
 
     if restart_containers is False:
-        return jsonify(success=True, message=str(len(old_containers)) + "containers updated"), 200
+        return jsonify(success=True, message=str(len(old_containers)) + " containers updated"), 200
 
     print ('\tCreating new containers...')
     new_containers = []
@@ -71,7 +71,7 @@ def image_puller():
     for container in old_containers:
         container.remove()
 
-    return jsonify(success=True, message=str(len(old_containers)) + "containers updated and restarted"), 200
+    return jsonify(success=True, message=str(len(old_containers)) + " containers updated and restarted"), 200
 
 @click.command()
 @click.option('-h',      default='0.0.0.0', help='Set the host')
