@@ -88,7 +88,7 @@ def main(h, p, debug):
 
     if registry_user and registry_passwd:
         try:
-            docker.login(username=registry_user, password=registry_passwd, registry=registry_url)
+            client.login(username=registry_user, password=registry_passwd, registry=registry_url)
         except Exception as e:
             print(e)
             sys.exit(1)
