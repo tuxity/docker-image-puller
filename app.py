@@ -20,15 +20,15 @@ def main():
 
 @app.route('/images/pull', methods=['POST'])
 def image_puller():
-    if not request.args['token'] or not request.args['image']:
+    if not request.form['token'] or not request.form['image']:
         return jsonify(success=False, error="Missing parameters"), 400
 
-    image = request.args['image']
+    image = request.form['image']
 
-    if request.args['token'] != os.environ['TOKEN']:
+    if request.form['token'] != os.environ['TOKEN']:
         return jsonify(success=False, error="Invalid token"), 403
 
-    restart_containers = True if request.args['restart_containers'] == "true" else False
+    restart_containers = True if request.form['restart_containers'] == "true" else False
 
     old_containers = []
     for container in client.containers.list():
