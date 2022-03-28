@@ -1,5 +1,5 @@
-FROM python:3.7-alpine
-MAINTAINER Kévin Darcel <kevin.darcel@gmail.com>
+FROM python:3.10-alpine
+LABEL maintainer="Kévin Darcel <tuxity@users.noreply.github.com>"
 
 WORKDIR /usr/src/docker-image-updater
 

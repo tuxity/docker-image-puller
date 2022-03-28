@@ -35,7 +35,7 @@ def image_puller():
         if re.match( r'.*' + re.escape(image) + r'$', container.attrs['Config']['Image']):
             old_containers.append(container)
 
-    if len(old_containers) is 0:
+    if len(old_containers) == 0:
         return jsonify(success=False, error="No running containers found with the specified image"), 404
 
     print ('Updating', str(len(old_containers)), 'containers with', image, 'image')
@@ -46,7 +46,7 @@ def image_puller():
     print ('\tPulling new image...')
     client.images.pull(image_name, tag=image_tag)
 
-    if restart_containers is False:
+    if restart_containers == False:
         return jsonify(success=True, message=str(len(old_containers)) + " containers updated"), 200
 
     print ('\tCreating new containers...')
